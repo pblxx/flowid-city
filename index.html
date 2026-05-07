@@ -685,20 +685,33 @@
             }
 
             if (player.activePet > 0) {
-                petData.phase += 0.1;
+                // Hacemos que la oscilación natural sea más lenta y suave
+                petData.phase += 0.05; 
+                
                 if (player.activePet === 3) {
-                    let tX = player.x - 50 * Math.cos(petData.phase * 0.5); let tY = player.y - 50 * Math.sin(petData.phase * 0.5); let tZ = player.z + 40 + Math.sin(petData.phase) * 20;
-                    petData.segments[0].x += (tX - petData.segments[0].x) * 0.1; petData.segments[0].y += (tY - petData.segments[0].y) * 0.1; petData.segments[0].z += (tZ - petData.segments[0].z) * 0.1;
+                    // La serpiente sigue tu estela suavemente
+                    let tX = player.x - player.lastDx * 45 + Math.cos(petData.phase) * 15; 
+                    let tY = player.y - player.lastDy * 45 + Math.sin(petData.phase) * 15; 
+                    let tZ = player.z + 40 + Math.sin(petData.phase * 2) * 15;
+                    
+                    petData.segments[0].x += (tX - petData.segments[0].x) * 0.08; 
+                    petData.segments[0].y += (tY - petData.segments[0].y) * 0.08; 
+                    petData.segments[0].z += (tZ - petData.segments[0].z) * 0.1;
+                    
                     for(let i=1; i<petData.segments.length; i++) {
                         let prev = petData.segments[i-1]; let curr = petData.segments[i];
                         curr.x += (prev.x - curr.x) * 0.3; curr.y += (prev.y - curr.y) * 0.3; curr.z += (prev.z - curr.z) * 0.3;
                     }
                 } else {
-                    let tX = player.x - 30 * Math.cos(player.walkPhase || petData.phase);
-                    let tY = player.y - 30 * Math.sin(player.walkPhase || petData.phase);
-                    let tZ = player.activePet === 1 ? player.z + Math.abs(Math.sin(petData.phase))*15 : player.z + 40 + Math.sin(petData.phase)*10;
+                    // Las otras mascotas también siguen tu espalda de forma tranquila
+                    let tX = player.x - player.lastDx * 35 + Math.cos(petData.phase) * 10;
+                    let tY = player.y - player.lastDy * 35 + Math.sin(petData.phase) * 10;
+                    let tZ = player.activePet === 1 ? player.z + Math.abs(Math.sin(petData.phase * 2))*15 : player.z + 40 + Math.sin(petData.phase * 2)*10;
+                    
                     petData.x = petData.x || player.x; petData.y = petData.y || player.y; petData.z = petData.z || player.z;
-                    petData.x += (tX - petData.x) * 0.1; petData.y += (tY - petData.y) * 0.1; petData.z += (tZ - petData.z) * 0.1;
+                    petData.x += (tX - petData.x) * 0.08; 
+                    petData.y += (tY - petData.y) * 0.08; 
+                    petData.z += (tZ - petData.z) * 0.1;
                 }
             }
 
@@ -959,7 +972,7 @@
             bullets.forEach(b => { if(Math.abs(player.x - b.x) < viewRadius && Math.abs(player.y - b.y) < viewRadius) render.push({ t: 'bullet', d: b, z: getCenterDepth('bullet', b) }); });
 
             [...bots, player].forEach(c => { if(Math.abs(player.x - c.x) < viewRadius && Math.abs(player.y - c.y) < viewRadius) render.push({ t: 'char', d: c, z: getCenterDepth('char', c) }); });
-            if (player.activePet > 0) render.push({ t: 'pet', d: null, z: getCenterDepth('pet', null) });
+            if (player.activePet > 0) render.push({ t: 'pet', d: petData, z: getCenterDepth('pet', petData) });
 
             render.sort((a,b) => a.z - b.z);
             
