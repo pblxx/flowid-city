@@ -23,23 +23,9 @@
             height: 100vh;
             background: radial-gradient(circle at 50% 50%, #1e1e2f 0%, #12121a 100%);
         }
-
-        .cinematic-bars::before, .cinematic-bars::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 10%;
-            background: #09090e; 
-            z-index: 20;
-            pointer-events: none;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
-        .cinematic-bars::before { top: 0; }
-        .cinematic-bars::after { bottom: 0; }
     </style>
 </head>
-<body class="cinematic-bars" oncontextmenu="return false;"> 
+<body oncontextmenu="return false;"> 
 
     <div id="camera-ui" style="position: absolute; top: 2.5%; right: 2%; z-index: 60;">
         <button id="viewToggleBtn" class="bg-slate-800/80 text-cyan-400 px-6 py-2 rounded-full border border-cyan-500 font-bold hover:bg-slate-700 transition shadow-[0_0_15px_rgba(6,182,212,0.4)] backdrop-blur-md cursor-pointer">
@@ -47,30 +33,28 @@
         </button>
     </div>
 
-    <!-- UI MÓVIL: Controles Táctiles (Premium Design) -->
-    <div id="mobile-controls" class="hidden absolute bottom-8 left-0 w-full px-8 flex justify-between items-end pointer-events-none z-50">
-        
-        <!-- Joystick Zone -->
-        <div id="joystick-zone" class="relative w-36 h-36 rounded-full border-2 border-cyan-500/40 bg-gradient-to-br from-slate-900/90 to-slate-800/90 shadow-[0_0_30px_rgba(6,182,212,0.3),inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-md pointer-events-auto flex items-center justify-center overflow-hidden">
-            <div class="absolute w-24 h-24 rounded-full border border-cyan-500/20"></div>
-            <div class="absolute w-12 h-12 rounded-full border border-cyan-500/10"></div>
-            <div id="joystick-knob" class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-300 to-cyan-600 shadow-[0_0_20px_rgba(6,182,212,1),inset_0_2px_4px_rgba(255,255,255,0.6)] absolute pointer-events-none"></div>
+    <!-- JOYSTICK MÓVIL (Oculto en PC, solo para pantallas táctiles) -->
+    <div id="joystick-container" class="hidden absolute bottom-8 left-8 z-50 pointer-events-none">
+        <div id="joystick-zone" class="relative w-32 h-32 md:w-36 md:h-36 rounded-full border-2 border-cyan-500/40 bg-gradient-to-br from-slate-900/90 to-slate-800/90 shadow-[0_0_30px_rgba(6,182,212,0.3),inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-md pointer-events-auto flex items-center justify-center overflow-hidden">
+            <div class="absolute w-20 h-20 md:w-24 md:h-24 rounded-full border border-cyan-500/20"></div>
+            <div class="absolute w-10 h-10 md:w-12 md:h-12 rounded-full border border-cyan-500/10"></div>
+            <div id="joystick-knob" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-cyan-300 to-cyan-600 shadow-[0_0_20px_rgba(6,182,212,1),inset_0_2px_4px_rgba(255,255,255,0.6)] absolute pointer-events-none"></div>
         </div>
+    </div>
 
-        <!-- Botones de Acción -->
-        <div class="flex flex-col gap-4 pointer-events-auto items-end">
-            <div class="flex gap-4 mb-1">
-                <button id="btn-hoverboard" class="w-14 h-14 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.4),inset_0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center">
-                    <i class="fas fa-rocket text-xl"></i>
-                </button>
-                <button id="btn-jump" class="w-14 h-14 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.4),inset_0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center">
-                    <i class="fas fa-arrow-up text-xl"></i>
-                </button>
-            </div>
-            <button id="btn-interact" class="w-20 h-20 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_20px_rgba(6,182,212,0.4),inset_0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center">
-                <i class="fas fa-hand-pointer text-4xl"></i>
+    <!-- BOTONES DE ACCIÓN (Visibles siempre: ratón y táctil) -->
+    <div id="action-buttons" class="absolute bottom-8 right-8 flex flex-col gap-3 md:gap-4 pointer-events-auto items-end z-50">
+        <div class="flex gap-3 md:gap-4 mb-1">
+            <button id="btn-hoverboard" class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.4),inset_0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center cursor-pointer">
+                <i class="fas fa-rocket text-lg md:text-xl"></i>
+            </button>
+            <button id="btn-jump" class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.4),inset_0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center cursor-pointer">
+                <i class="fas fa-arrow-up text-lg md:text-xl"></i>
             </button>
         </div>
+        <button id="btn-interact" class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_20px_rgba(6,182,212,0.4),inset_0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center cursor-pointer">
+            <i class="fas fa-hand-pointer text-3xl md:text-4xl"></i>
+        </button>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -273,9 +257,9 @@
             if(joystickKnob) joystickKnob.style.transform = `translate(0px, 0px)`;
         });
 
-        // --- CONTROLES MÓVILES ---
+        // --- CONTROLES MÓVILES Y BOTONES UI ---
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (isTouchDevice) { document.getElementById('mobile-controls').classList.remove('hidden'); }
+        if (isTouchDevice) { document.getElementById('joystick-container').classList.remove('hidden'); }
 
         const joystickZone = document.getElementById('joystick-zone');
         const joystickKnob = document.getElementById('joystick-knob');
@@ -311,10 +295,16 @@
             joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
         }
 
-        // Action Buttons
-        document.getElementById('btn-hoverboard').addEventListener('touchstart', (e) => { e.preventDefault(); toggleHoverboard(); initAudio(); }, {passive:false});
-        document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); triggerJump(); initAudio(); }, {passive:false});
-        document.getElementById('btn-interact').addEventListener('touchstart', (e) => { e.preventDefault(); handleInteraction(); initAudio(); }, {passive:false});
+        // Action Buttons (Eventos universales para Táctil y Ratón de PC)
+        function bindButton(id, action) {
+            const btn = document.getElementById(id);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); action(); initAudio(); }, {passive:false});
+            btn.addEventListener('mousedown', (e) => { e.preventDefault(); action(); initAudio(); });
+        }
+
+        bindButton('btn-hoverboard', toggleHoverboard);
+        bindButton('btn-jump', triggerJump);
+        bindButton('btn-interact', handleInteraction);
 
         function toggleHoverboard() {
             if(player.fishingState === 0 && playerInventory.hasHoverboard) {
