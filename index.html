@@ -11,12 +11,8 @@
         
         body {
             margin: 0;
-   	    padding: 0;
             overflow: hidden;
-            font-family: "Rethink Sans", sans-serif;
-	    font-optical-sizing: auto;
-            font-weight: <weight>;
-            font-style: normal;
+            font-family: 'Nunito', sans-serif;
             background-color: #12121a; 
             touch-action: none;
         }
@@ -280,7 +276,7 @@
             x: START_X, y: START_Y, z: 0, baseZ: 0, vz: 0, targetX: START_X, targetY: START_Y, 
             radius: 20, color: playerNeonColors[0], name: 'Tú', speed: 5.5,
             walkPhase: 0, lastStep: 0, hasHoverboard: true, hbVx: 0, hbVy: 0, isUsingHoverboard: false,
-            activePet: 0, colorIndex: 0, fishingState: 0
+            activePet: 0, colorIndex: 0, fishingState: 0, lastDx: 1, lastDy: 1
         };
 
         const petData = { x: START_X, y: START_Y, z: 0, phase: 0, segments: Array.from({length: 8}, () => ({x: START_X, y: START_Y, z: 50})) };
@@ -374,9 +370,44 @@
             btn.addEventListener('mousedown', (e) => { e.preventDefault(); action(); initAudio(); });
         }
 
+        // Función unificada para generar el proyectil
+        function shootAt(tx, ty) {
+            playSound('shoot', 1);
+            let dx = tx - player.x;
+            let dy = ty - player.y;
+            let dist = Math.hypot(dx, dy);
+            if (dist > 0) {
+                bullets.push({
+                    x: player.x, y: player.y, z: player.z + 15,
+                    vx: (dx/dist) * 25, vy: (dy/dist) * 25, vz: 0,
+                    life: 60, color: player.color
+                });
+            }
+        }
+
         bindButton('btn-hoverboard', toggleHoverboard);
         bindButton('btn-jump', triggerJump);
-        bindButton('btn-interact', handleInteraction);
+        
+        // El botón de la mirilla ahora dispara si no hay interacción (con auto-apuntado en móvil)
+        bindButton('btn-interact', () => {
+            let didInteract = handleInteraction();
+            if (!didInteract && player.fishingState === 0 && !player.isUsingHoverboard) {
+                let targetBug = null;
+                let minDist = 1500;
+                bots.forEach(b => {
+                    if (b.isBug) {
+                        let dist = Math.hypot(b.x - player.x, b.y - player.y);
+                        if (dist < minDist) { minDist = dist; targetBug = b; }
+                    }
+                });
+                
+                if (targetBug) {
+                    shootAt(targetBug.x, targetBug.y); // Auto-apuntado al bug más cercano
+                } else {
+                    shootAt(player.x + player.lastDx, player.y + player.lastDy); // Disparo frontal si no hay bugs
+                }
+            }
+        });
 
         function toggleHoverboard() {
             if(player.fishingState === 0 && playerInventory.hasHoverboard) {
@@ -441,25 +472,9 @@
                 // Intentamos interactuar primero. Si no hay nada con lo que interactuar, dispara.
                 let didInteract = handleInteraction();
                 
-                if (!didInteract && player.fishingState === 0) {
-                    // --- MECÁNICA DE DISPARO ---
-                    playSound('shoot', 1);
-                    let dx = worldPos.x - player.x;
-                    let dy = worldPos.y - player.y;
-                    let dist = Math.hypot(dx, dy);
-                    
-                    if (dist > 0) {
-                        bullets.push({
-                            x: player.x,
-                            y: player.y,
-                            z: player.z + 15,
-                            vx: (dx/dist) * 25, // Un poco más rápida
-                            vy: (dy/dist) * 25,
-                            vz: 0,
-                            life: 60,
-                            color: player.color
-                        });
-                    }
+                if (!didInteract && player.fishingState === 0 && !player.isUsingHoverboard) {
+                    // --- MECÁNICA DE DISPARO (PC Click / Canvas Tap) ---
+                    shootAt(worldPos.x, worldPos.y);
                 } else {
                     clickEffects.push({x: worldPos.x, y: worldPos.y, z: player.baseZ, radius: 0, alpha: 1});
                 }
@@ -560,17 +575,21 @@
                     let acc = 1.2; let fri = 0.94;
                     if (mx !== 0 || my !== 0) {
                         let l = Math.hypot(mx, my); 
+                        player.lastDx = mx / l; // Guardamos dirección
+                        player.lastDy = my / l;
                         let intensity = kActive ? 1 : joystickIntensity;
-                        player.hbVx += (mx / l) * acc * intensity; player.hbVy += (my / l) * acc * intensity;
+                        player.hbVx += player.lastDx * acc * intensity; player.hbVy += player.lastDy * acc * intensity;
                     }
                     player.hbVx *= fri; player.hbVy *= fri;
                     player.x += player.hbVx; player.y += player.hbVy;
                     isMovingPlayer = Math.hypot(player.hbVx, player.hbVy) > 0.5;
                 } else if (mx !== 0 || my !== 0) {
                     let l = Math.hypot(mx, my);
+                    player.lastDx = mx / l; // Guardamos dirección
+                    player.lastDy = my / l;
                     let intensity = kActive ? 1 : joystickIntensity;
-                    player.x += (mx / l) * player.speed * intensity; 
-                    player.y += (my / l) * player.speed * intensity;
+                    player.x += player.lastDx * player.speed * intensity; 
+                    player.y += player.lastDy * player.speed * intensity;
                     isMovingPlayer = true;
                 }
                 resolveHardCollision(player);
