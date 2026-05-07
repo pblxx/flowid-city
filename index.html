@@ -325,12 +325,13 @@
 
         const keys = {};
         window.addEventListener('keydown', e => { 
-            keys[e.key] = true; initAudio(); 
-            if (e.key === 'b' || e.key === 'B') toggleHoverboard();
-            if (e.key === 'e' || e.key === 'E') handleInteraction();
-            if (e.key === ' ' || e.key === 'Spacebar') triggerJump();
+            let k = e.key.toLowerCase();
+            keys[k] = true; initAudio(); 
+            if (k === 'b') toggleHoverboard();
+            if (k === 'e') handleInteraction();
+            if (k === ' ' || k === 'spacebar') triggerJump();
         });
-        window.addEventListener('keyup', e => { keys[e.key] = false; });
+        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
         window.addEventListener('blur', () => { 
             for (let k in keys) keys[k] = false; 
@@ -576,15 +577,15 @@
 
             if (player.fishingState === 0) { 
                 let mx = 0, my = 0;
-                let kActive = keys['w'] || keys['W'] || keys['ArrowUp'] || keys['s'] || keys['S'] || keys['ArrowDown'] || keys['a'] || keys['A'] || keys['ArrowLeft'] || keys['d'] || keys['D'] || keys['ArrowRight'];
+                let kActive = keys['w'] || keys['arrowup'] || keys['s'] || keys['arrowdown'] || keys['a'] || keys['arrowleft'] || keys['d'] || keys['arrowright'];
                 
                 let joystickIntensity = Math.min(1, Math.hypot(joyX, joyY));
 
                 if (kActive) {
-                    if (keys['w'] || keys['W'] || keys['ArrowUp']) { mx -= 1; my -= 1; }
-                    if (keys['s'] || keys['S'] || keys['ArrowDown']) { mx += 1; my += 1; }
-                    if (keys['a'] || keys['A'] || keys['ArrowLeft']) { mx -= 1; my += 1; }
-                    if (keys['d'] || keys['D'] || keys['ArrowRight']) { mx += 1; my -= 1; }
+                    if (keys['w'] || keys['arrowup']) { mx -= 1; my -= 1; }
+                    if (keys['s'] || keys['arrowdown']) { mx += 1; my += 1; }
+                    if (keys['a'] || keys['arrowleft']) { mx -= 1; my += 1; }
+                    if (keys['d'] || keys['arrowright']) { mx += 1; my -= 1; }
                 } else if (joystickIntensity > 0.05) {
                     mx = joyY + joyX; my = joyY - joyX;
                 }
