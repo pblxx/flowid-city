@@ -410,7 +410,7 @@
         // El botón de la mirilla ahora dispara si no hay interacción (con auto-apuntado en móvil)
         bindButton('btn-interact', () => {
             let didInteract = handleInteraction();
-            if (!didInteract && player.fishingState === 0 && !player.isUsingHoverboard) {
+            if (!didInteract && player.fishingState === 0) {
                 let targetBug = null;
                 let minDist = 1500;
                 bots.forEach(b => {
@@ -449,7 +449,7 @@
         }
 
         function triggerJump() { 
-            if (player.z <= player.baseZ + 5 && player.fishingState === 0 && !player.isUsingHoverboard) { player.vz = 14; playSound('jump', 1); } 
+            if (player.z <= player.baseZ + 5 && player.fishingState === 0) { player.vz = 14; playSound('jump', 1); } 
         }
 
         let initialPinchDistance = null;
@@ -460,7 +460,6 @@
         let nearestInteractable = null;
 
         function handleInteraction() {
-            if (player.isUsingHoverboard) return false; 
             if (player.fishingState === 1) { player.fishingState = 0; player.fishLake = null; return true; } 
             else if (player.fishingState === 2) { player.fishingState = 0; player.fishLake = null; playSound('splash', 1); createParticles(player.x, player.y, player.z, '#06b6d4', 30); return true; } 
             else if (nearestInteractable && nearestInteractable.type === 'lake') { player.fishingState = 1; player.fishLake = nearestInteractable.obj; player.fishWait = 100 + Math.random() * 200; return true; } 
@@ -491,7 +490,7 @@
                 // Intentamos interactuar primero. Si no hay nada con lo que interactuar, dispara.
                 let didInteract = handleInteraction();
                 
-                if (!didInteract && player.fishingState === 0 && !player.isUsingHoverboard) {
+                if (!didInteract && player.fishingState === 0) {
                     // --- MECÁNICA DE DISPARO (PC Click / Canvas Tap) ---
                     shootAt(worldPos.x, worldPos.y);
                 } else {
@@ -725,7 +724,7 @@
             }
 
             nearestInteractable = null;
-            if (player.fishingState === 0 && !player.isUsingHoverboard && player.z === 0) {
+            if (player.fishingState === 0 && player.z === 0) {
                 lakes.forEach(l => { if (Math.hypot(player.x - l.x, player.y - l.y) < l.radius + 60) nearestInteractable = { type: 'lake', obj: l }; });
                 fountains.forEach(f => { if (Math.hypot(player.x - f.x, player.y - f.y) < f.radius + 60) nearestInteractable = { type: 'lake', obj: f }; });
                 gachaMachines.forEach(g => { if (Math.hypot(player.x - (g.x+g.w/2), player.y - (g.y+g.l/2)) < 60) nearestInteractable = { type: 'gacha', obj: g }; });
@@ -733,7 +732,7 @@
             }
 
             let touchingPortal = null;
-            if (player.fishingState === 0 && !player.isUsingHoverboard && player.z === 0) {
+            if (player.fishingState === 0 && player.z === 0) {
                 for(let p of portals) { if (Math.hypot(player.x - p.x, player.y - p.y) < p.radius && Math.abs(player.z - p.z) < 50) { touchingPortal = p; break; } }
             }
             if (touchingPortal !== currentPortal) { currentPortal = touchingPortal; if (currentPortal) { nearestInteractable = { type: 'portal', obj: currentPortal }; } }
@@ -873,7 +872,12 @@
             let pColor = player.activePet === 1 ? '#06b6d4' : (player.activePet === 2 ? '#facc15' : '#10b981');
             if (player.activePet === 3) {
                 for(let i = petData.segments.length - 1; i >= 0; i--) {
-                    let seg = petData.segments[i]; let pos = toScreen(seg.x, seg.y, seg.z); let isHead = (i === 0); let size = isHead ? 8 : 6 - i;
+                    let seg = petData.segments[i]; let pos = toScreen(seg.x, seg.y, seg.z); 
+                    let isHead = (i === 0); 
+                    
+                    // FIX: Impedimos que el radio de la cola sea negativo o cero
+                    let size = isHead ? 8 : Math.max(1.5, 6 - i); 
+                    
                     ctx.fillStyle = isHead ? '#fff' : pColor; ctx.beginPath(); ctx.arc(pos.x, pos.y, size, 0, Math.PI*2); ctx.fill();
                     if (isHead) { ctx.strokeStyle = pColor; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pos.x, pos.y, size + 4, 0, Math.PI*2); ctx.stroke(); }
                     if (i > 0) { let prev = toScreen(petData.segments[i-1].x, petData.segments[i-1].y, petData.segments[i-1].z); ctx.strokeStyle = `rgba(16, 185, 129, 0.4)`; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
