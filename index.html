@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>looop.games - Director's Cut (Final Mobile Ready)</title>
+    <title>flowid.design - Labs (Bug Hunter)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -27,13 +27,30 @@
 </head>
 <body oncontextmenu="return false;"> 
 
-    <div id="camera-ui" style="position: absolute; top: 2.5%; right: 2%; z-index: 60;">
-        <button id="viewToggleBtn" class="bg-slate-800/80 text-cyan-400 px-6 py-2 rounded-full border border-cyan-500 font-bold hover:bg-slate-700 transition shadow-[0_0_15px_rgba(6,182,212,0.4)] backdrop-blur-md cursor-pointer">
-            <i class="fas fa-camera"></i> CAM: ISOMÉTRICA
-        </button>
+    <!-- HUD DE MISION (NUEVO) -->
+    <div id="mission-hud" class="absolute top-6 left-6 z-50 text-white font-bold tracking-widest text-xs md:text-sm bg-slate-900/60 px-4 py-3 rounded-lg border border-cyan-500/30 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all duration-300">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-bug text-red-400" id="hud-icon"></i>
+            <span>OBJETIVO: DEPURAR BUGS (<span id="bug-counter">0</span>/7)</span>
+        </div>
     </div>
 
-    <!-- JOYSTICK MÓVIL (Oculto en PC, solo para pantallas táctiles) -->
+    <!-- MENSAJE DE VICTORIA (NUEVO) -->
+    <div id="win-message" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-center pointer-events-none transition-opacity duration-1000 opacity-0">
+        <h2 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-[0_0_20px_rgba(16,185,129,0.8)] mb-2 tracking-tight">
+            ENTORNO ESTABLE
+        </h2>
+        <p class="text-white text-sm md:text-base tracking-widest uppercase opacity-80">Laboratorio optimizado correctamente</p>
+    </div>
+
+    <!-- HINT DE ZOOM (NUEVO) -->
+    <div id="zoom-hint" class="absolute top-6 left-1/2 transform -translate-x-1/2 z-50 text-white/70 bg-slate-900/40 px-4 py-2 rounded-full border border-white/10 backdrop-blur-sm text-xs font-bold tracking-widest flex items-center gap-2 transition-opacity duration-1000 pointer-events-none">
+        <i class="fas fa-search-plus text-cyan-400"></i>
+        <span class="hidden md:inline">SCROLL PARA ZOOM</span>
+        <span class="inline md:hidden">PELLIZCAR PARA ZOOM</span>
+    </div>
+
+    <!-- JOYSTICK MÓVIL -->
     <div id="joystick-container" class="hidden absolute bottom-8 left-8 z-50 pointer-events-none">
         <div id="joystick-zone" class="relative w-32 h-32 md:w-36 md:h-36 rounded-full border-2 border-cyan-500/40 bg-gradient-to-br from-slate-900/90 to-slate-800/90 shadow-[0_0_30px_rgba(6,182,212,0.3),inset_0_0_20px_rgba(0,0,0,0.8)] backdrop-blur-md pointer-events-auto flex items-center justify-center overflow-hidden">
             <div class="absolute w-20 h-20 md:w-24 md:h-24 rounded-full border border-cyan-500/20"></div>
@@ -42,7 +59,7 @@
         </div>
     </div>
 
-    <!-- BOTONES DE ACCIÓN (Visibles siempre: ratón y táctil) -->
+    <!-- BOTONES DE ACCIÓN -->
     <div id="action-buttons" class="absolute bottom-8 right-8 flex flex-col gap-3 md:gap-4 pointer-events-auto items-end z-50">
         <div class="flex gap-3 md:gap-4 mb-1">
             <button id="btn-hoverboard" class="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_15px_rgba(6,182,212,0.4),inset_0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center cursor-pointer">
@@ -53,8 +70,20 @@
             </button>
         </div>
         <button id="btn-interact" class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-slate-800/90 to-slate-900/90 text-cyan-300 font-bold shadow-[0_0_20px_rgba(6,182,212,0.4),inset_0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md active:scale-95 active:shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all flex items-center justify-center cursor-pointer">
-            <i class="fas fa-hand-pointer text-3xl md:text-4xl"></i>
+            <i class="fas fa-crosshairs text-3xl md:text-4xl"></i> 
         </button>
+    </div>
+
+    <!-- INSTRUCCIONES PC -->
+    <div id="desktop-instructions" class="hidden absolute bottom-8 right-8 z-50 text-white font-bold tracking-widest text-xs bg-slate-900/60 px-5 py-4 rounded-lg border border-cyan-500/30 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+        <div class="flex flex-col gap-3 text-right">
+            <div class="text-cyan-400 text-sm mb-1 uppercase tracking-[0.2em] border-b border-cyan-500/30 pb-2">Controles Lab</div>
+            <div class="flex items-center justify-end gap-3"><span class="opacity-80 text-cyan-100">MOVERSE</span> <span class="text-cyan-300 bg-slate-800/80 px-2 py-1 rounded border border-cyan-500/50">W A S D</span></div>
+            <div class="flex items-center justify-end gap-3"><span class="opacity-80 text-cyan-100">DISPARAR</span> <span class="text-cyan-300 bg-slate-800/80 px-2 py-1 rounded border border-cyan-500/50">CLICK</span></div>
+            <div class="flex items-center justify-end gap-3"><span class="opacity-80 text-cyan-100">SALTAR</span> <span class="text-cyan-300 bg-slate-800/80 px-2 py-1 rounded border border-cyan-500/50">ESPACIO</span></div>
+            <div class="flex items-center justify-end gap-3"><span class="opacity-80 text-cyan-100">HOVERBOARD</span> <span class="text-cyan-300 bg-slate-800/80 px-2 py-1 rounded border border-cyan-500/50">B</span></div>
+            <div class="flex items-center justify-end gap-3"><span class="opacity-80 text-cyan-100">ZOOM</span> <span class="text-cyan-300 bg-slate-800/80 px-2 py-1 rounded border border-cyan-500/50">SCROLL</span></div>
+        </div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -66,8 +95,37 @@
         
         let playerInventory = { coins: 9999, fish: 99, hasHoverboard: true };
 
+        // Variables de la misión
+        const TOTAL_BUGS = 7;
+        let bugsFixed = 0;
+
+        function updateMissionHUD() {
+            document.getElementById('bug-counter').innerText = bugsFixed;
+            if (bugsFixed >= TOTAL_BUGS) {
+                document.getElementById('hud-icon').classList.replace('fa-bug', 'fa-check-circle');
+                document.getElementById('hud-icon').classList.replace('text-red-400', 'text-emerald-400');
+                document.getElementById('mission-hud').classList.add('border-emerald-500/50', 'shadow-[0_0_20px_rgba(16,185,129,0.3)]');
+                
+                const winMsg = document.getElementById('win-message');
+                winMsg.classList.remove('hidden');
+                setTimeout(() => { winMsg.classList.remove('opacity-0'); winMsg.classList.add('opacity-100'); }, 100);
+                setTimeout(() => { winMsg.classList.remove('opacity-100'); winMsg.classList.add('opacity-0'); }, 4000);
+                setTimeout(() => { winMsg.classList.add('hidden'); }, 5000);
+            }
+        }
+
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
+
+        // --- PREPARACIÓN DEL LOGO SVG ---
+        const logoImg = new Image();
+        const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200">
+            <rect x="0" y="0" width="320" height="200" rx="100" ry="100" fill="#f4f4f5" />
+            <rect x="50" y="50" width="220" height="100" rx="50" ry="50" fill="#000000" />
+            <circle cx="100" cy="100" r="40" fill="#f4f4f5" />
+        </svg>`;
+        const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+        logoImg.src = URL.createObjectURL(svgBlob);
 
         // --- 2. SISTEMA DE AUDIO ---
         let audioCtx;
@@ -77,6 +135,7 @@
         }
         window.addEventListener('mousedown', initAudio, { once: true });
         window.addEventListener('keydown', initAudio, { once: true });
+        window.addEventListener('touchstart', initAudio, { once: true });
 
         function playSound(type, vol = 1) {
             if (!audioCtx || audioCtx.state !== 'running' || vol <= 0.01) return;
@@ -105,45 +164,50 @@
                 osc.type = 'sine'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(150, now + 0.5);
                 gain.gain.setValueAtTime(0.03 * vol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
                 osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'shoot') { 
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                gain.gain.setValueAtTime(0.05 * vol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'teleport') { 
+                osc.type = 'square'; osc.frequency.setValueAtTime(100, now); osc.frequency.linearRampToValueAtTime(800, now + 0.4);
+                gain.gain.setValueAtTime(0.1 * vol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'fix') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.linearRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.08 * vol, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
             }
         }
-        
-        function playSpatialSound(type, sourceX, sourceY) {
-            let dx = player.x - sourceX; let dy = player.y - sourceY;
-            let dist = Math.hypot(dx, dy); let maxDist = 1200;
-            let vol = Math.max(0, 1 - (dist / maxDist));
-            if (vol > 0) playSound(type, vol * vol); 
-        }
-
-        let viewMode = 'iso'; 
 
         // --- 3. CÁMARA Y ZOOM ---
         function toScreen(worldX, worldY, worldZ) { 
-            if (viewMode === 'iso') {
-                return { x: worldX - worldY, y: (worldX + worldY) / 2 - worldZ };
-            } else {
-                return { x: worldX, y: worldY * 0.5 - worldZ };
-            }
+            return { x: worldX - worldY, y: (worldX + worldY) / 2 - worldZ };
         }
         function toWorld(screenX, screenY, cameraX, cameraY) { 
             let cx = window.innerWidth / 2; let cy = window.innerHeight * 0.6;
             let unzoomedX = (screenX - cx) / camera.zoom + cx; let unzoomedY = (screenY - cy) / camera.zoom + cy;
             let adjX = unzoomedX + cameraX; let adjY = unzoomedY + cameraY; 
-            if (viewMode === 'iso') {
-                return { x: (adjX + 2 * adjY) / 2, y: (2 * adjY - adjX) / 2 };
-            } else {
-                return { x: adjX, y: adjY / 0.5 }; 
-            }
+            return { x: (adjX + 2 * adjY) / 2, y: (2 * adjY - adjX) / 2 };
         }
 
         // --- ZOOM ADAPTATIVO MÓVIL/PC ---
-        let initialZoom = window.innerWidth < 768 ? 0.5 : 0.85;
+        let initialZoom = window.innerWidth < 768 ? 0.45 : 0.85;
         const camera = { x: 0, y: 0, targetX: 0, targetY: 0, zoom: initialZoom, targetZoom: initialZoom };
         let mouseX = 0, mouseY = 0;
 
-        window.addEventListener('mousemove', e => { mouseX = e.touches ? e.touches[0].clientX : e.clientX; mouseY = e.touches ? e.touches[0].clientY : e.clientY; });
+        // Ocultar hint de zoom
+        const zoomHint = document.getElementById('zoom-hint');
+        let hintTimeout = setTimeout(() => { if(zoomHint) zoomHint.classList.add('opacity-0'); }, 8000);
+        function hideZoomHint() {
+            if(zoomHint && !zoomHint.classList.contains('opacity-0')) {
+                zoomHint.classList.add('opacity-0'); clearTimeout(hintTimeout);
+            }
+        }
+
+        window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
         window.addEventListener('wheel', e => {
             e.preventDefault(); 
+            hideZoomHint(); 
             camera.targetZoom += e.deltaY * -0.0015;
             camera.targetZoom = Math.max(0.3, Math.min(2.5, camera.targetZoom));
         }, { passive: false });
@@ -170,13 +234,10 @@
         const lakes = [];
         const terminals = []; 
         const gachaMachines = []; 
+        // Tren desplazado al centro de la avenida y elevado a 1250 (por encima de todos los rascacielos)
+        const trains = [{ x: -2000, y: 4210, z: 1250, w: 800, l: 80, vx: 25, vy: 0, c: '#f43f5e' }];
         const fountains = []; 
-        
-        // CORRECCIÓN: Trenes alineados exactamente con el centro de las carreteras para evitar clipping
-        const trains = [
-            { x: -2000, y: 3150, z: 500, w: 800, l: 80, vx: 25, vy: 0, c: '#f43f5e' }, // Tren Rojo
-            { x: W_SIZE + 1000, y: 5350, z: 650, w: 800, l: 80, vx: -22, vy: 0, c: '#06b6d4' }  // Nuevo Tren Azul (dirección opuesta)
-        ];
+        const bullets = []; 
 
         const bColors = ['#1a1b26', '#16161e', '#24283b', '#1f2335'];
         const playerNeonColors = ['#38bdf8', '#ec4899', '#10b981', '#facc15', '#a855f7', '#f43f5e', '#ffffff'];
@@ -186,7 +247,7 @@
         const metroPlazasCoord = [{ bx: STEP * 3, by: STEP * 3 }, { bx: STEP * 6, by: STEP * 6 }];
         const normalParksCoord = []; 
 
-        // Generación del Mapa con Inteligencia Espacial
+        // Generación del Mapa
         for (let bx = 0; bx < W_SIZE; bx += STEP) {
             for (let by = 0; by < W_SIZE; by += STEP) {
                 let isMetroPlaza = metroPlazasCoord.some(p => p.bx === bx && p.by === by);
@@ -232,30 +293,45 @@
         // --- 5. ENTIDADES ---
         const player = { 
             x: START_X, y: START_Y, z: 0, baseZ: 0, vz: 0, targetX: START_X, targetY: START_Y, 
-            radius: 20, color: playerNeonColors[0], name: 'Tú', speed: 5.5, // VELOCIDAD REDUCIDA PARA MEJOR CONTROL
+            radius: 20, color: playerNeonColors[0], name: 'Tú', speed: 5.5, 
             walkPhase: 0, lastStep: 0, hasHoverboard: true, hbVx: 0, hbVy: 0, isUsingHoverboard: false,
-            activePet: 0, colorIndex: 0, fishingState: 0
+            activePet: 0, colorIndex: 0, fishingState: 0, lastDx: 1, lastDy: 1
         };
 
         const petData = { x: START_X, y: START_Y, z: 0, phase: 0, segments: Array.from({length: 8}, () => ({x: START_X, y: START_Y, z: 50})) };
 
         const bots = [];
-        const botColors = ['#f472b6', '#a855f7', '#34d399', '#fbbf24', '#ef4444'];
+        const botColors = ['#f472b6', '#a855f7', '#34d399', '#fbbf24']; 
+        
         for(let i=0; i < 30; i++) {
+            let isBug = i < TOTAL_BUGS;
             let bx = Math.random() * W_SIZE; let by = Math.random() * W_SIZE;
-            bots.push({ x: bx, y: by, z: 0, baseZ: 0, vz: 0, targetX: bx, targetY: by, radius: 18, color: botColors[i % botColors.length], name: `Ciudadano ${i+1}`, speed: 1.5 + Math.random() * 1.5, idleTimer: 0, walkPhase: Math.random() * Math.PI, lastStep: 0 });
+            
+            if(isBug) {
+                bx = START_X + (Math.random() * 3000 - 1500);
+                by = START_Y + (Math.random() * 3000 - 1500);
+            }
+
+            bots.push({ 
+                x: bx, y: by, z: 0, baseZ: 0, vz: 0, targetX: bx, targetY: by, radius: 18, 
+                color: isBug ? '#ef4444' : botColors[i % botColors.length], 
+                name: isBug ? `ERR_404` : `Ciudadano ${i}`, 
+                speed: isBug ? 4.5 : 1.5 + Math.random() * 1.5, 
+                idleTimer: 0, walkPhase: Math.random() * Math.PI, lastStep: 0,
+                isBug: isBug
+            });
         }
 
         const keys = {};
         window.addEventListener('keydown', e => { 
-            keys[e.key] = true; initAudio(); 
-            if (e.key === 'b' || e.key === 'B') toggleHoverboard();
-            if (e.key === 'e' || e.key === 'E') handleInteraction();
-            if (e.key === ' ' || e.key === 'Spacebar') triggerJump();
+            let k = e.key.toLowerCase();
+            keys[k] = true; initAudio(); 
+            if (k === 'b') toggleHoverboard();
+            if (k === 'e') handleInteraction();
+            if (k === ' ' || k === 'spacebar') triggerJump();
         });
-        window.addEventListener('keyup', e => { keys[e.key] = false; });
+        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-        // NUEVO: Reseteo de seguridad cuando la ventana pierde el foco
         window.addEventListener('blur', () => { 
             for (let k in keys) keys[k] = false; 
             joyActive = false; joyX = 0; joyY = 0;
@@ -264,7 +340,12 @@
 
         // --- CONTROLES MÓVILES Y BOTONES UI ---
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (isTouchDevice) { document.getElementById('joystick-container').classList.remove('hidden'); }
+        if (isTouchDevice) { 
+            document.getElementById('joystick-container').classList.remove('hidden'); 
+        } else {
+            document.getElementById('action-buttons').classList.add('hidden');
+            document.getElementById('desktop-instructions').classList.remove('hidden');
+        }
 
         const joystickZone = document.getElementById('joystick-zone');
         const joystickKnob = document.getElementById('joystick-knob');
@@ -286,7 +367,6 @@
             joystickKnob.style.transform = `translate(0px, 0px)`;
         }, {passive: false});
 
-        // NUEVO: Reseteo de seguridad si el gesto táctil es interrumpido por el sistema
         joystickZone.addEventListener('touchcancel', (e) => {
             e.preventDefault(); joyActive = false; joyX = 0; joyY = 0;
             joystickKnob.style.transform = `translate(0px, 0px)`;
@@ -300,16 +380,49 @@
             joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
         }
 
-        // Action Buttons (Eventos universales para Táctil y Ratón de PC)
+        // Action Buttons
         function bindButton(id, action) {
             const btn = document.getElementById(id);
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); action(); initAudio(); }, {passive:false});
             btn.addEventListener('mousedown', (e) => { e.preventDefault(); action(); initAudio(); });
         }
 
+        function shootAt(tx, ty) {
+            playSound('shoot', 1);
+            let dx = tx - player.x;
+            let dy = ty - player.y;
+            let dist = Math.hypot(dx, dy);
+            if (dist > 0) {
+                bullets.push({
+                    x: player.x, y: player.y, z: player.z + 15,
+                    vx: (dx/dist) * 25, vy: (dy/dist) * 25, vz: 0,
+                    life: 60, color: player.color
+                });
+            }
+        }
+
         bindButton('btn-hoverboard', toggleHoverboard);
         bindButton('btn-jump', triggerJump);
-        bindButton('btn-interact', handleInteraction);
+        
+        bindButton('btn-interact', () => {
+            let didInteract = handleInteraction();
+            if (!didInteract && player.fishingState === 0) {
+                let targetBug = null;
+                let minDist = 1500;
+                bots.forEach(b => {
+                    if (b.isBug) {
+                        let dist = Math.hypot(b.x - player.x, b.y - player.y);
+                        if (dist < minDist) { minDist = dist; targetBug = b; }
+                    }
+                });
+                
+                if (targetBug) {
+                    shootAt(targetBug.x, targetBug.y); 
+                } else {
+                    shootAt(player.x + player.lastDx, player.y + player.lastDy); 
+                }
+            }
+        });
 
         function toggleHoverboard() {
             if(player.fishingState === 0 && playerInventory.hasHoverboard) {
@@ -332,7 +445,7 @@
         }
 
         function triggerJump() { 
-            if (player.z <= player.baseZ + 5 && player.fishingState === 0 && !player.isUsingHoverboard) { player.vz = 14; playSound('jump', 1); } 
+            if (player.z <= player.baseZ + 5 && player.fishingState === 0) { player.vz = 14; playSound('jump', 1); } 
         }
 
         let initialPinchDistance = null;
@@ -343,18 +456,18 @@
         let nearestInteractable = null;
 
         function handleInteraction() {
-            if (player.isUsingHoverboard) return; 
-            if (player.fishingState === 1) { player.fishingState = 0; player.fishLake = null; } 
-            else if (player.fishingState === 2) { player.fishingState = 0; player.fishLake = null; playSound('splash', 1); createParticles(player.x, player.y, player.z, '#06b6d4', 30); } 
-            else if (nearestInteractable && nearestInteractable.type === 'lake') { player.fishingState = 1; player.fishLake = nearestInteractable.obj; player.fishWait = 100 + Math.random() * 200; } 
-            else if (nearestInteractable && nearestInteractable.type === 'portal') { enterGame(); } 
-            else if (nearestInteractable && nearestInteractable.type === 'gacha') { playSound('powerup', 1); createParticles(nearestInteractable.obj.x + 15, nearestInteractable.obj.y + 15, 60, '#ec4899', 30); player.activePet = Math.floor(Math.random() * 3) + 1; } 
-            else if (nearestInteractable && nearestInteractable.type === 'terminal') { player.colorIndex = (player.colorIndex + 1) % playerNeonColors.length; player.color = playerNeonColors[player.colorIndex]; playSound('powerup', 1); createParticles(player.x, player.y, player.z, player.color, 30); }
+            if (player.fishingState === 1) { player.fishingState = 0; player.fishLake = null; return true; } 
+            else if (player.fishingState === 2) { player.fishingState = 0; player.fishLake = null; playSound('splash', 1); createParticles(player.x, player.y, player.z, '#06b6d4', 30); return true; } 
+            else if (nearestInteractable && nearestInteractable.type === 'lake') { player.fishingState = 1; player.fishLake = nearestInteractable.obj; player.fishWait = 100 + Math.random() * 200; return true; } 
+            else if (nearestInteractable && nearestInteractable.type === 'portal') { enterGame(); return true; } 
+            else if (nearestInteractable && nearestInteractable.type === 'gacha') { playSound('powerup', 1); createParticles(nearestInteractable.obj.x + 15, nearestInteractable.obj.y + 15, 60, '#ec4899', 30); player.activePet = Math.floor(Math.random() * 3) + 1; return true; } 
+            else if (nearestInteractable && nearestInteractable.type === 'terminal') { player.colorIndex = (player.colorIndex + 1) % playerNeonColors.length; player.color = playerNeonColors[player.colorIndex]; playSound('powerup', 1); createParticles(player.x, player.y, player.z, player.color, 30); return true; }
+            return false;
         }
 
+        // --- MANEJADOR INTELIGENTE DEL CLICK ---
         function setMouseTarget(e) {
             initAudio();
-            // Zoom: Detectar pinch to zoom
             if (e.type === 'touchstart' && e.touches && e.touches.length === 2) {
                 let dx = e.touches[0].clientX - e.touches[1].clientX;
                 let dy = e.touches[0].clientY - e.touches[1].clientY;
@@ -362,23 +475,60 @@
                 initialZoomAtPinch = camera.targetZoom;
                 return;
             }
-            // Acción: Tap o click en canvas interactúa
+            
             if (e.target === canvas && (!e.touches || e.touches.length === 1)) {
-                handleInteraction();
+                
                 let mx = e.touches ? e.touches[0].clientX : e.clientX; 
                 let my = e.touches ? e.touches[0].clientY : e.clientY;
                 let worldPos = toWorld(mx, my, camera.x, camera.y);
-                clickEffects.push({x: worldPos.x, y: worldPos.y, z: player.baseZ, radius: 0, alpha: 1});
+
+                let didInteract = false;
+
+                if (player.fishingState > 0) {
+                    didInteract = handleInteraction(); 
+                } else {
+                    // Verificamos si el click cae EXACTAMENTE dentro de la elipse visual de un lago o fuente
+                    let clickedWater = null;
+                    // El 0.7 encaja el radio de la colisión esférica con el dibujo isométrico achatado
+                    lakes.forEach(l => { if (Math.hypot(worldPos.x - l.x, worldPos.y - l.y) < l.radius * 0.7) clickedWater = { type: 'lake', obj: l }; });
+                    fountains.forEach(f => { if (Math.hypot(worldPos.x - f.x, worldPos.y - f.y) < f.radius * 0.7) clickedWater = { type: 'lake', obj: f }; });
+
+                    if (clickedWater) {
+                        // Si hemos clicado agua, verificamos que el jugador está al lado para permitir la pesca
+                        if (Math.hypot(player.x - clickedWater.obj.x, player.y - clickedWater.obj.y) < clickedWater.obj.radius * 0.7 + 80) {
+                            let oldNearest = nearestInteractable;
+                            nearestInteractable = clickedWater; // Forzamos la interacción solo con esa agua
+                            didInteract = handleInteraction();
+                            nearestInteractable = oldNearest;
+                        }
+                    } else {
+                        // Si hemos clicado el suelo, anulamos temporalmente el lago como objeto cercano
+                        // para que NO se ponga a pescar, sino que interactúe (portales) o dispare.
+                        let oldNearest = nearestInteractable;
+                        if (nearestInteractable && nearestInteractable.type === 'lake') {
+                            nearestInteractable = null;
+                        }
+                        didInteract = handleInteraction();
+                        nearestInteractable = oldNearest;
+                    }
+                }
+                
+                // Si no se hizo ninguna interacción (por ej. si hizo clic en el suelo vacío), dispara
+                if (!didInteract && player.fishingState === 0) {
+                    shootAt(worldPos.x, worldPos.y);
+                } else if (didInteract) {
+                    clickEffects.push({x: worldPos.x, y: worldPos.y, z: player.baseZ, radius: 0, alpha: 1});
+                }
             }
         }
 
         window.addEventListener('mousedown', setMouseTarget);
         window.addEventListener('touchstart', setMouseTarget, {passive: false});
 
-        // Zoom: Movimiento del Pinch
         window.addEventListener('touchmove', (e) => {
             if (e.touches && e.touches.length === 2 && initialPinchDistance) {
                 e.preventDefault();
+                hideZoomHint(); 
                 let dx = e.touches[0].clientX - e.touches[1].clientX;
                 let dy = e.touches[0].clientY - e.touches[1].clientY;
                 let currentDistance = Math.hypot(dx, dy);
@@ -386,11 +536,6 @@
                 camera.targetZoom = Math.max(0.3, Math.min(2.5, initialZoomAtPinch * ratio));
             }
         }, {passive: false});
-
-        document.getElementById('viewToggleBtn').addEventListener('click', () => {
-            viewMode = viewMode === 'iso' ? 'ortho' : 'iso';
-            document.getElementById('viewToggleBtn').innerHTML = `<i class="fas fa-camera"></i> CAM: ${viewMode === 'iso' ? 'ISOMÉTRICA' : 'ORTOGONAL'}`;
-        });
 
         // --- 6. FÍSICAS Y ACTUALIZACIÓN ---
         function resolveHardCollision(char) {
@@ -422,25 +567,26 @@
                 }
             });
 
+            // CORRECCIÓN COLISIONES AGUA: Ajustamos el radio físico para que cuadre perfectamente con el render isométrico
             lakes.forEach(l => {
-                if (char.z > 20) return;
+                let colRadius = l.radius * 0.7; // El círculo dibujado es un 30% más pequeño visualmente
                 let dx = char.x - l.x; let dy = char.y - l.y; let dist = Math.hypot(dx, dy);
-                if (dist < l.radius + char.radius) {
-                    let overlap = (l.radius + char.radius) - dist;
+                if (dist < colRadius + char.radius) {
+                    let overlap = (colRadius + char.radius) - dist;
                     char.x += (dx/dist) * overlap; char.y += (dy/dist) * overlap;
                     hit = true;
                 }
             });
 
             fountains.forEach(f => {
-                if (char.z > 40) return;
+                let colRadius = f.radius * 0.7;
                 let dx = char.x - f.x; let dy = char.y - f.y; let dist = Math.hypot(dx, dy);
-                if (dist < f.radius + char.radius) {
-                    let overlap = (f.radius + char.radius) - dist; char.x += (dx/dist) * overlap; char.y += (dy/dist) * overlap; hit = true;
+                if (dist < colRadius + char.radius) {
+                    let overlap = (colRadius + char.radius) - dist; char.x += (dx/dist) * overlap; char.y += (dy/dist) * overlap; hit = true;
                 }
             });
             
-            if (hit && char !== player) { char.targetX = char.x; char.targetY = char.y; char.idleTimer = 60; }
+            if (hit && char !== player) { char.targetX = char.x; char.targetY = char.y; char.idleTimer = char.isBug ? 20 : 60; }
         }
 
         let isMovingPlayer = false;
@@ -449,36 +595,21 @@
             fountains.forEach(f => f.phase += 0.05);
             gachaMachines.forEach(g => g.phase += 0.05);
             terminals.forEach(t => t.phase += 0.05);
-            
-            // Actualización de trenes para que funcionen en ambas direcciones
-            trains.forEach(t => { 
-                t.x += t.vx; 
-                t.y += t.vy; 
-                if(t.vx > 0 && t.x > W_SIZE + 2000) t.x = -2000; 
-                if(t.vx < 0 && t.x < -2000) t.x = W_SIZE + 2000;
-            });
+            trains.forEach(t => { t.x += t.vx; t.y += t.vy; if(t.x > W_SIZE + 2000) t.x = -2000; });
 
             if (player.fishingState === 0) { 
                 let mx = 0, my = 0;
-                let kActive = keys['w'] || keys['W'] || keys['ArrowUp'] || keys['s'] || keys['S'] || keys['ArrowDown'] || keys['a'] || keys['A'] || keys['ArrowLeft'] || keys['d'] || keys['D'] || keys['ArrowRight'];
+                let kActive = keys['w'] || keys['arrowup'] || keys['s'] || keys['arrowdown'] || keys['a'] || keys['arrowleft'] || keys['d'] || keys['arrowright'];
                 
                 let joystickIntensity = Math.min(1, Math.hypot(joyX, joyY));
 
                 if (kActive) {
-                    if (viewMode === 'iso') {
-                        if (keys['w'] || keys['W'] || keys['ArrowUp']) { mx -= 1; my -= 1; }
-                        if (keys['s'] || keys['S'] || keys['ArrowDown']) { mx += 1; my += 1; }
-                        if (keys['a'] || keys['A'] || keys['ArrowLeft']) { mx -= 1; my += 1; }
-                        if (keys['d'] || keys['D'] || keys['ArrowRight']) { mx += 1; my -= 1; }
-                    } else {
-                        if (keys['w'] || keys['W'] || keys['ArrowUp']) { my -= 1; }
-                        if (keys['s'] || keys['S'] || keys['ArrowDown']) { my += 1; }
-                        if (keys['a'] || keys['A'] || keys['ArrowLeft']) { mx -= 1; }
-                        if (keys['d'] || keys['D'] || keys['ArrowRight']) { mx += 1; }
-                    }
+                    if (keys['w'] || keys['arrowup']) { mx -= 1; my -= 1; }
+                    if (keys['s'] || keys['arrowdown']) { mx += 1; my += 1; }
+                    if (keys['a'] || keys['arrowleft']) { mx -= 1; my += 1; }
+                    if (keys['d'] || keys['arrowright']) { mx += 1; my -= 1; }
                 } else if (joystickIntensity > 0.05) {
-                    if (viewMode === 'iso') { mx = joyY + joyX; my = joyY - joyX; } 
-                    else { mx = joyX; my = joyY; }
+                    mx = joyY + joyX; my = joyY - joyX;
                 }
                 
                 isMovingPlayer = false;
@@ -486,17 +617,21 @@
                     let acc = 1.2; let fri = 0.94;
                     if (mx !== 0 || my !== 0) {
                         let l = Math.hypot(mx, my); 
+                        player.lastDx = mx / l; 
+                        player.lastDy = my / l;
                         let intensity = kActive ? 1 : joystickIntensity;
-                        player.hbVx += (mx / l) * acc * intensity; player.hbVy += (my / l) * acc * intensity;
+                        player.hbVx += player.lastDx * acc * intensity; player.hbVy += player.lastDy * acc * intensity;
                     }
                     player.hbVx *= fri; player.hbVy *= fri;
                     player.x += player.hbVx; player.y += player.hbVy;
                     isMovingPlayer = Math.hypot(player.hbVx, player.hbVy) > 0.5;
                 } else if (mx !== 0 || my !== 0) {
                     let l = Math.hypot(mx, my);
+                    player.lastDx = mx / l; 
+                    player.lastDy = my / l;
                     let intensity = kActive ? 1 : joystickIntensity;
-                    player.x += (mx / l) * player.speed * intensity; 
-                    player.y += (my / l) * player.speed * intensity;
+                    player.x += player.lastDx * player.speed * intensity; 
+                    player.y += player.lastDy * player.speed * intensity;
                     isMovingPlayer = true;
                 }
                 resolveHardCollision(player);
@@ -516,25 +651,82 @@
                     resolveHardCollision(b);
                 } else {
                     b.idleTimer--;
-                    if (b.idleTimer <= 0) { b.targetX = b.x + (Math.random()*600-300); b.targetY = b.y + (Math.random()*600-300); b.idleTimer = 200; }
+                    if (b.idleTimer <= 0) { 
+                        let range = b.isBug ? 1200 : 600; 
+                        b.targetX = b.x + (Math.random()*range - range/2); 
+                        b.targetY = b.y + (Math.random()*range - range/2); 
+                        b.idleTimer = b.isBug ? 50 : 200; 
+                    }
                 }
             });
 
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                b.z += b.vz;
+                b.life--;
+
+                bots.forEach(bot => {
+                    if (Math.hypot(b.x - bot.x, b.y - bot.y) < bot.radius + 15 && Math.abs(b.z - bot.z) < 30) {
+                        
+                        if (bot.isBug) {
+                            bot.isBug = false;
+                            bot.color = '#10b981'; 
+                            bot.name = "FIXED";
+                            bot.speed = 1.5; 
+                            bot.vz = 15; 
+                            
+                            bugsFixed++;
+                            updateMissionHUD();
+                            playSound('fix', 1);
+                            createParticles(bot.x, bot.y, bot.z, '#10b981', 20);
+                        } else {
+                            bot.targetX = bot.x + b.vx * 3;
+                            bot.targetY = bot.y + b.vy * 3;
+                            bot.vz = 8;
+                            let oldColor = bot.color;
+                            bot.color = '#ffffff';
+                            setTimeout(() => { if(!bot.isBug) bot.color = oldColor; }, 100);
+                            playSound('step', 0.5); 
+                        }
+                        
+                        b.life = 0; 
+                        createParticles(b.x, b.y, b.z, '#ffffff', 8);
+                    }
+                });
+
+                if (b.life <= 0) {
+                    createParticles(b.x, b.y, b.z, b.color, 4);
+                    bullets.splice(i, 1);
+                }
+            }
+
             if (player.activePet > 0) {
-                petData.phase += 0.1;
+                petData.phase += 0.05; 
+                
                 if (player.activePet === 3) {
-                    let tX = player.x - 50 * Math.cos(petData.phase * 0.5); let tY = player.y - 50 * Math.sin(petData.phase * 0.5); let tZ = player.z + 40 + Math.sin(petData.phase) * 20;
-                    petData.segments[0].x += (tX - petData.segments[0].x) * 0.1; petData.segments[0].y += (tY - petData.segments[0].y) * 0.1; petData.segments[0].z += (tZ - petData.segments[0].z) * 0.1;
+                    let tX = player.x - player.lastDx * 45 + Math.cos(petData.phase) * 15; 
+                    let tY = player.y - player.lastDy * 45 + Math.sin(petData.phase) * 15; 
+                    let tZ = player.z + 40 + Math.sin(petData.phase * 2) * 15;
+                    
+                    petData.segments[0].x += (tX - petData.segments[0].x) * 0.08; 
+                    petData.segments[0].y += (tY - petData.segments[0].y) * 0.08; 
+                    petData.segments[0].z += (tZ - petData.segments[0].z) * 0.1;
+                    
                     for(let i=1; i<petData.segments.length; i++) {
                         let prev = petData.segments[i-1]; let curr = petData.segments[i];
                         curr.x += (prev.x - curr.x) * 0.3; curr.y += (prev.y - curr.y) * 0.3; curr.z += (prev.z - curr.z) * 0.3;
                     }
                 } else {
-                    let tX = player.x - 30 * Math.cos(player.walkPhase || petData.phase);
-                    let tY = player.y - 30 * Math.sin(player.walkPhase || petData.phase);
-                    let tZ = player.activePet === 1 ? player.z + Math.abs(Math.sin(petData.phase))*15 : player.z + 40 + Math.sin(petData.phase)*10;
+                    let tX = player.x - player.lastDx * 35 + Math.cos(petData.phase) * 10;
+                    let tY = player.y - player.lastDy * 35 + Math.sin(petData.phase) * 10;
+                    let tZ = player.activePet === 1 ? player.z + Math.abs(Math.sin(petData.phase * 2))*15 : player.z + 40 + Math.sin(petData.phase * 2)*10;
+                    
                     petData.x = petData.x || player.x; petData.y = petData.y || player.y; petData.z = petData.z || player.z;
-                    petData.x += (tX - petData.x) * 0.1; petData.y += (tY - petData.y) * 0.1; petData.z += (tZ - petData.z) * 0.1;
+                    petData.x += (tX - petData.x) * 0.08; 
+                    petData.y += (tY - petData.y) * 0.08; 
+                    petData.z += (tZ - petData.z) * 0.1;
                 }
             }
 
@@ -547,15 +739,16 @@
             }
 
             nearestInteractable = null;
-            if (player.fishingState === 0 && !player.isUsingHoverboard && player.z === 0) {
-                lakes.forEach(l => { if (Math.hypot(player.x - l.x, player.y - l.y) < l.radius + 60) nearestInteractable = { type: 'lake', obj: l }; });
-                fountains.forEach(f => { if (Math.hypot(player.x - f.x, player.y - f.y) < f.radius + 60) nearestInteractable = { type: 'lake', obj: f }; });
+            if (player.fishingState === 0 && player.z === 0) {
+                // Actualizado para usar el radio real visual (.7) y así solo activarse cuando estás realmente pegado
+                lakes.forEach(l => { if (Math.hypot(player.x - l.x, player.y - l.y) < l.radius * 0.7 + 60) nearestInteractable = { type: 'lake', obj: l }; });
+                fountains.forEach(f => { if (Math.hypot(player.x - f.x, player.y - f.y) < f.radius * 0.7 + 60) nearestInteractable = { type: 'lake', obj: f }; });
                 gachaMachines.forEach(g => { if (Math.hypot(player.x - (g.x+g.w/2), player.y - (g.y+g.l/2)) < 60) nearestInteractable = { type: 'gacha', obj: g }; });
                 terminals.forEach(t => { if (Math.hypot(player.x - (t.x+t.w/2), player.y - (t.y+t.l/2)) < 60) nearestInteractable = { type: 'terminal', obj: t }; });
             }
 
             let touchingPortal = null;
-            if (player.fishingState === 0 && !player.isUsingHoverboard && player.z === 0) {
+            if (player.fishingState === 0 && player.z === 0) {
                 for(let p of portals) { if (Math.hypot(player.x - p.x, player.y - p.y) < p.radius && Math.abs(player.z - p.z) < 50) { touchingPortal = p; break; } }
             }
             if (touchingPortal !== currentPortal) { currentPortal = touchingPortal; if (currentPortal) { nearestInteractable = { type: 'portal', obj: currentPortal }; } }
@@ -579,8 +772,9 @@
             if (type === 'building' || type === 'park') { cx = item.x + item.w / 2; cy = item.y + item.l / 2; } 
             else if (type === 'gacha' || type === 'terminal' || type === 'train') { cx = item.x + item.w / 2; cy = item.y + item.l / 2; } 
             else if (type === 'pet' && player.activePet === 3) { cx = petData.segments[0].x; cy = petData.segments[0].y; } 
+            else if (type === 'bullet' || type === 'logo') { cx = item.x; cy = item.y; }
             else { cx = item.x; cy = item.y; }
-            return viewMode === 'iso' ? (cx + cy) : cy;
+            return cx + cy;
         }
 
         function drawIsoBox(x, y, z, w, l, h, colorTop, colorLeft, colorRight) {
@@ -606,16 +800,12 @@
 
         function drawBuilding(b) {
             drawIsoBox(b.x, b.y, 0, b.w, b.l, 10, '#12121a', '#0a0a0f', '#0a0a0f');
-            let pScreen = toScreen(player.x, player.y, player.z); let bFrontScreenY = toScreen(b.x, b.y + b.l, 0).y; let bBackRoofScreenY = toScreen(b.x, b.y, b.h).y;
+            let pScreen = toScreen(player.x, player.y, player.z); 
             let isObscuring = false;
             
-            if (viewMode === 'iso') {
-                let bDepth = b.x + b.y + Math.max(b.w, b.l); let bCenterScreen = toScreen(b.x + b.w/2, b.y + b.l/2, 0);
-                let dxScreen = Math.abs(pScreen.x - bCenterScreen.x); let dyScreen = bCenterScreen.y - pScreen.y;
-                if (bDepth > (player.x + player.y) - 300 && player.z < b.h && dxScreen < (b.w + b.l) * 1.5 && dyScreen > -400 && dyScreen < b.h + 400) isObscuring = true;
-            } else {
-                if (player.y < b.y + b.l && player.x > b.x - 30 && player.x < b.x + b.w + 30 && pScreen.y < bFrontScreenY && pScreen.y > bBackRoofScreenY) isObscuring = true;
-            }
+            let bDepth = b.x + b.y + Math.max(b.w, b.l); let bCenterScreen = toScreen(b.x + b.w/2, b.y + b.l/2, 0);
+            let dxScreen = Math.abs(pScreen.x - bCenterScreen.x); let dyScreen = bCenterScreen.y - pScreen.y;
+            if (bDepth > (player.x + player.y) - 300 && player.z < b.h && dxScreen < (b.w + b.l) * 1.5 && dyScreen > -400 && dyScreen < b.h + 400) isObscuring = true;
 
             if (isObscuring) {
                 ctx.strokeStyle = `rgba(6, 182, 212, 0.25)`; ctx.lineWidth = 2;
@@ -627,7 +817,7 @@
             ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = b.neon; let neonThickness = 6; 
             for(let hz = 150; hz < b.h - 50; hz += 200) {
                 drawIsoPoly([{x:b.x, y:b.y+b.l+0.5, z:hz}, {x:b.x+b.w, y:b.y+b.l+0.5, z:hz}, {x:b.x+b.w, y:b.y+b.l+0.5, z:hz+neonThickness}, {x:b.x, y:b.y+b.l+0.5, z:hz+neonThickness}], b.neon);
-                if (viewMode === 'iso') drawIsoPoly([{x:b.x+b.w+0.5, y:b.y, z:hz}, {x:b.x+b.w+0.5, y:b.y+b.l, z:hz}, {x:b.x+b.w+0.5, y:b.y+b.l, z:hz+neonThickness}, {x:b.x+b.w+0.5, y:b.y, z:hz+neonThickness}], b.neon);
+                drawIsoPoly([{x:b.x+b.w+0.5, y:b.y, z:hz}, {x:b.x+b.w+0.5, y:b.y+b.l, z:hz}, {x:b.x+b.w+0.5, y:b.y+b.l, z:hz+neonThickness}, {x:b.x+b.w+0.5, y:b.y, z:hz+neonThickness}], b.neon);
             }
             ctx.globalCompositeOperation = 'source-over'; 
             drawIsoBox(b.x, b.y, b.h, b.w, b.l, 15, '#1f2335', '#16161e', '#16161e');
@@ -698,7 +888,11 @@
             let pColor = player.activePet === 1 ? '#06b6d4' : (player.activePet === 2 ? '#facc15' : '#10b981');
             if (player.activePet === 3) {
                 for(let i = petData.segments.length - 1; i >= 0; i--) {
-                    let seg = petData.segments[i]; let pos = toScreen(seg.x, seg.y, seg.z); let isHead = (i === 0); let size = isHead ? 8 : 6 - i;
+                    let seg = petData.segments[i]; let pos = toScreen(seg.x, seg.y, seg.z); 
+                    let isHead = (i === 0); 
+                    
+                    let size = isHead ? 8 : Math.max(1.5, 6 - i); 
+                    
                     ctx.fillStyle = isHead ? '#fff' : pColor; ctx.beginPath(); ctx.arc(pos.x, pos.y, size, 0, Math.PI*2); ctx.fill();
                     if (isHead) { ctx.strokeStyle = pColor; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pos.x, pos.y, size + 4, 0, Math.PI*2); ctx.stroke(); }
                     if (i > 0) { let prev = toScreen(petData.segments[i-1].x, petData.segments[i-1].y, petData.segments[i-1].z); ctx.strokeStyle = `rgba(16, 185, 129, 0.4)`; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
@@ -722,6 +916,11 @@
             let sShrink = (c.z + bounce - currentZ) * 0.4;
             
             if (sShrink < c.radius * 1.2) { ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.ellipse(s.x, s.y, (c.radius*1.2) - sShrink, (c.radius*0.6) - (sShrink*0.5), 0, 0, Math.PI*2); ctx.fill(); }
+            
+            if (c.isBug && c.z <= c.baseZ + 5) {
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.3)'; ctx.beginPath(); ctx.ellipse(s.x, s.y, c.radius*1.8, c.radius*0.9, 0, 0, Math.PI*2); ctx.fill();
+            }
+
             if (isP && !c.isUsingHoverboard) { ctx.fillStyle = c.color; ctx.globalAlpha = 0.15; ctx.beginPath(); ctx.ellipse(s.x, s.y, c.radius*2.5, c.radius*1.2, 0, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1; }
             
             ctx.save(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#12121a'; ctx.fillStyle = c.color;
@@ -737,9 +936,20 @@
             ctx.beginPath(); ctx.arc(p.x - c.radius*0.85, by + bh*0.7 + fO, c.radius*0.35, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.arc(p.x + c.radius*0.85, by + bh*0.7 - handO, c.radius*0.35, 0, Math.PI*2); ctx.fill(); ctx.stroke();
             
             let headY = p.y - c.radius * 0.2; ctx.beginPath(); ctx.arc(p.x, headY, c.radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = '#12121a'; ctx.beginPath(); ctx.arc(p.x - 4, headY + 2, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(p.x + 6, headY + 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#12121a'; 
+            
+            if(c.isBug) {
+                ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(p.x - 4, headY + 2, 3.5, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(p.x + 6, headY + 2, 3.5, 0, Math.PI * 2); ctx.fill();
+            } else {
+                ctx.beginPath(); ctx.arc(p.x - 4, headY + 2, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(p.x + 6, headY + 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            }
+            
             ctx.restore();
-            ctx.fillStyle = isP ? '#facc15' : '#ffffff'; ctx.font = 'bold 12px Nunito'; ctx.textAlign = 'center'; ctx.fillText(c.name, p.x, p.y - c.radius - 15);
+            
+            ctx.fillStyle = c.isBug ? '#ef4444' : (isP ? '#facc15' : '#ffffff'); 
+            ctx.font = 'bold 12px Nunito'; ctx.textAlign = 'center'; 
+            let drawName = c.isBug && Math.random() > 0.8 ? c.name + '%' : c.name;
+            ctx.fillText(drawName, p.x, p.y - c.radius - 15);
         }
 
         function drawCityTerrain(viewRadius) {
@@ -762,6 +972,8 @@
             drawCityTerrain(viewRadius);
 
             let render = [];
+            render.push({ t: 'logo', d: {x: START_X, y: START_Y}, z: -5 });
+
             buildings.forEach(b => { if(Math.abs(player.x - (b.x+b.w/2)) < viewRadius && Math.abs(player.y - (b.y+b.l/2)) < viewRadius) render.push({ t: 'building', d: b, z: getCenterDepth('building', b) }); });
             fountains.forEach(f => { if(Math.abs(player.x - f.x) < viewRadius && Math.abs(player.y - f.y) < viewRadius) render.push({ t: 'fountain', d: f, z: getCenterDepth('fountain', f) }); });
             lakes.forEach(l => { if(Math.abs(player.x - l.x) < viewRadius && Math.abs(player.y - l.y) < viewRadius) render.push({ t: 'lake', d: l, z: getCenterDepth('lake', l) }); });
@@ -770,10 +982,22 @@
             holoTrees.forEach(t => { if(Math.abs(player.x - t.x) < viewRadius && Math.abs(player.y - t.y) < viewRadius) render.push({ t: 'holotree', d: t, z: getCenterDepth('holotree', t) }); });
             streetlights.forEach(sl => { if(Math.abs(player.x - sl.x) < viewRadius && Math.abs(player.y - sl.y) < viewRadius) render.push({ t: 'streetlight', d: sl, z: getCenterDepth('streetlight', sl) }); });
             portals.forEach(p => { if(Math.abs(player.x - p.x) < viewRadius && Math.abs(player.y - p.y) < viewRadius) render.push({ t: 'portal', d: p, z: getCenterDepth('portal', p) }); });
-            trains.forEach(tr => render.push({ t: 'train', d: tr, z: getCenterDepth('train', tr) }));
             
+            // CORRECCIÓN CLIPPING: Dividimos el tren monolítico en vagones para arreglar el sorting isométrico
+            trains.forEach(tr => {
+                let numCars = 5; 
+                let carW = tr.w / numCars;
+                for(let i = 0; i < numCars; i++) {
+                    // carW - 8 genera un pequeño hueco visual que imita la junta entre vagones
+                    let car = { x: tr.x + (i * carW) + 4, y: tr.y, z: tr.z, w: carW - 8, l: tr.l, c: tr.c };
+                    render.push({ t: 'train', d: car, z: getCenterDepth('train', car) });
+                }
+            });
+            
+            bullets.forEach(b => { if(Math.abs(player.x - b.x) < viewRadius && Math.abs(player.y - b.y) < viewRadius) render.push({ t: 'bullet', d: b, z: getCenterDepth('bullet', b) }); });
+
             [...bots, player].forEach(c => { if(Math.abs(player.x - c.x) < viewRadius && Math.abs(player.y - c.y) < viewRadius) render.push({ t: 'char', d: c, z: getCenterDepth('char', c) }); });
-            if (player.activePet > 0) render.push({ t: 'pet', d: null, z: getCenterDepth('pet', null) });
+            if (player.activePet > 0) render.push({ t: 'pet', d: petData, z: getCenterDepth('pet', petData) });
 
             render.sort((a,b) => a.z - b.z);
             
@@ -782,12 +1006,32 @@
                 else if(i.t==='gacha') drawGacha(i.d); else if(i.t==='terminal') drawTerminal(i.d); else if(i.t==='holotree') drawHoloTree(i.d); 
                 else if(i.t==='streetlight') drawStreetlight(i.d); else if(i.t==='portal') drawPortal(i.d); else if(i.t==='train') drawTrain(i.d); 
                 else if(i.t==='char') drawCharacter(i.d); else if(i.t==='pet') drawPet();
+                else if(i.t==='bullet') { 
+                    let pos = toScreen(i.d.x, i.d.y, i.d.z);
+                    ctx.save();
+                    ctx.fillStyle = i.d.color;
+                    ctx.shadowColor = i.d.color; ctx.shadowBlur = 10;
+                    ctx.beginPath(); ctx.arc(pos.x, pos.y, 4, 0, Math.PI*2); ctx.fill();
+                    ctx.restore();
+                } else if(i.t==='logo') { 
+                    let pos = toScreen(i.d.x, i.d.y, 0);
+                    ctx.save();
+                    ctx.translate(pos.x, pos.y);
+                    
+                    ctx.scale(1, 0.5);
+                    ctx.rotate(-Math.PI / 4);
+                    
+                    ctx.globalAlpha = 0.9;
+                    let imgW = 200; let imgH = 125; 
+                    ctx.drawImage(logoImg, -imgW/2, -imgH/2, imgW, imgH);
+                    ctx.restore();
+                }
             });
             
             ctx.globalCompositeOperation = 'screen';
             ctx.lineWidth = 1.5;
             raindrops.forEach(r => { let p1 = toScreen(r.x, r.y, r.z); let p2 = toScreen(r.x - r.vx*2.5, r.y - r.vy*2.5, r.z - r.vz*2.5); ctx.strokeStyle = r.color; ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); });
-            particles.forEach(p => { let pos = toScreen(p.x, p.y, p.z); ctx.fillStyle = p.color; ctx.globalAlpha = p.life; ctx.beginPath(); ctx.arc(pos.x, pos.y, p.size, 0, Math.PI*2); ctx.fill(); });
+            particles.forEach(p => { let pos = toScreen(p.x, p.y, p.z); ctx.fillStyle = p.color; ctx.globalAlpha = Math.max(0, p.life); ctx.beginPath(); ctx.arc(pos.x, pos.y, p.size, 0, Math.PI*2); ctx.fill(); });
             ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
             
             clickEffects.forEach(e => { let pos = toScreen(e.x, e.y, e.z + 1); ctx.beginPath(); ctx.ellipse(pos.x, pos.y, e.radius, e.radius*0.5, 0, 0, Math.PI * 2); ctx.strokeStyle = `rgba(16, 185, 129, ${e.alpha})`; ctx.lineWidth = 2.5; ctx.stroke(); });
