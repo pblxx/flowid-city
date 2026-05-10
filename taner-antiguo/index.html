@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tañer Antiguo — Instrumentos Históricos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:        #110d07;
+            --surface:   #1c140a;
+            --surface2:  #261a0f;
+            --border:    #3d2d1a;
+            --gold:      #c9a55a;
+            --gold-light:#e0c07a;
+            --cream:     #f0e0c0;
+            --muted:     #9e8a6e;
+            --faint:     #5c4a35;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--cream);
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 18px;
+            line-height: 1.75;
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 3rem;
+            background: rgba(17, 13, 7, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: 1.3rem;
+            letter-spacing: 0.25em;
+            color: var(--gold);
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'EB Garamond', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--gold-light); }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 7rem 2rem 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 50% 50%, rgba(201,165,90,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,165,90,0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-ornament {
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(3.5rem, 9vw, 7rem);
+            letter-spacing: 0.12em;
+            color: var(--cream);
+            line-height: 1.05;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .hero-divider {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 2rem auto;
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--muted);
+            max-width: 520px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .hero-note {
+            font-size: 0.8rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--faint);
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--faint);
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            animation: fadeInUp 2s ease 1s both;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--gold), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(1); }
+            50% { opacity: 0.8; transform: scaleY(1.1); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ─── SECTIONS ─── */
+        section {
+            padding: 7rem 2rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ─── INSTRUMENT CARDS ─── */
+        .instrument {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-bottom: 5rem;
+        }
+
+        .instrument:last-child { margin-bottom: 0; }
+
+        .instrument-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .instrument-inner.reverse {
+            direction: rtl;
+        }
+
+        .instrument-inner.reverse > * {
+            direction: ltr;
+        }
+
+        .instrument-image {
+            position: relative;
+            background: var(--surface2);
+            min-height: 560px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instrument-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0.9;
+            transition: transform 0.8s ease, opacity 0.4s;
+        }
+
+        .instrument-image:hover img { transform: scale(1.03); opacity: 1; }
+
+        .img-placeholder {
+            width: 100%;
+            height: 100%;
+            min-height: 560px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, #1c140a 0%, #261a0f 50%, #1c140a 100%);
+            color: var(--faint);
+        }
+
+        .img-placeholder svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.4;
+        }
+
+        .img-placeholder span {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.5;
+        }
+
+        .instrument-body {
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .instrument-tag {
+            font-size: 0.65rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .instrument-tag::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .instrument-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 400;
+            color: var(--cream);
+            line-height: 1.2;
+            margin-bottom: 0.4rem;
+        }
+
+        .instrument-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        .instrument-desc {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border: 1px solid var(--border);
+            margin-bottom: 2.5rem;
+        }
+
+        .spec-item {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+
+        .spec-item:nth-child(even) { border-right: none; }
+        .spec-item:nth-last-child(-n+2) { border-bottom: none; }
+
+        .spec-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--faint);
+            margin-bottom: 0.2rem;
+        }
+
+        .spec-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--cream);
+        }
+
+        .btn-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 2rem;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'EB Garamond', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s;
+            align-self: flex-start;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .btn-contact:hover {
+            background: var(--gold);
+            color: var(--bg);
+        }
+
+        .btn-contact svg { width: 14px; height: 14px; }
+
+        /* ─── HISTORIA SALVADOR IBÁÑEZ ─── */
+        .historia {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .historia-inner {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 5rem;
+            align-items: start;
+        }
+
+        .historia-aside h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            line-height: 1.1;
+            color: var(--cream);
+            margin-bottom: 1.5rem;
+        }
+
+        .historia-aside h2 em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .historia-aside .year {
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .historia-content p {
+            color: var(--muted);
+            margin-bottom: 1.4rem;
+            font-size: 1rem;
+            line-height: 1.9;
+        }
+
+        .historia-content p:first-child {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--cream);
+            line-height: 1.7;
+        }
+
+        .historia-content strong {
+            color: var(--cream);
+            font-weight: 500;
+        }
+
+        .historia-pull {
+            border-left: 2px solid var(--gold);
+            padding: 1rem 0 1rem 1.8rem;
+            margin: 2rem 0;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--gold-light);
+            line-height: 1.5;
+        }
+
+        .timeline {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            padding-bottom: 1.8rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 2.9rem;
+            top: 1.8rem;
+            bottom: 0;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .timeline-item:last-child::before { display: none; }
+
+        .t-year {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            color: var(--gold);
+            min-width: 4rem;
+            padding-top: 0.05rem;
+            font-weight: 500;
+        }
+
+        .t-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold);
+            margin-top: 0.45rem;
+            flex-shrink: 0;
+        }
+
+        .t-text {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ─── CONTACTO ─── */
+        .contacto {
+            text-align: center;
+        }
+
+        .contacto h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--cream);
+            line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+
+        .contacto h2 em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .contacto-desc {
+            color: var(--muted);
+            max-width: 500px;
+            margin: 0 auto 3.5rem;
+            font-size: 1.05rem;
+        }
+
+        .contacto-cards {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .contacto-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2.5rem 3rem;
+            text-align: left;
+            min-width: 240px;
+            transition: border-color 0.3s;
+        }
+
+        .contacto-card:hover { border-color: var(--gold); }
+
+        .contacto-card-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .contacto-card-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--cream);
+        }
+
+        .contacto-card-value a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contacto-card-value a:hover { color: var(--gold-light); }
+
+        .contacto-note {
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--faint);
+            font-style: italic;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--faint);
+            font-size: 0.78rem;
+            letter-spacing: 0.15em;
+        }
+
+        footer span:first-child {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            letter-spacing: 0.25em;
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        /* ─── MOBILE ─── */
+        @media (max-width: 900px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { display: none; }
+
+            section { padding: 5rem 1.5rem; }
+
+            .instrument-inner,
+            .instrument-inner.reverse {
+                grid-template-columns: 1fr;
+                direction: ltr;
+            }
+
+            .instrument-image { min-height: 300px; }
+            .img-placeholder { min-height: 300px; }
+
+            .instrument-body { padding: 2.5rem 2rem; }
+
+            .specs-grid { grid-template-columns: 1fr; }
+            .spec-item:nth-child(even) { border-right: 1px solid var(--border); }
+            .spec-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+            .spec-item:last-child { border-bottom: none; }
+
+            .historia-inner {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+
+            .contacto-cards { flex-direction: column; align-items: center; }
+            .contacto-card { width: 100%; max-width: 340px; }
+
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" class="nav-logo">Tañer Antiguo</a>
+        <ul class="nav-links">
+            <li><a href="#instrumentos">Instrumentos</a></li>
+            <li><a href="#historia">Salvador Ibáñez</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <p class="hero-ornament">— ✦ —</p>
+        <h1>Tañer<br><em>Antiguo</em></h1>
+        <div class="hero-divider"></div>
+        <p class="hero-subtitle">
+            Instrumentos históricos de excepción<br>en busca del intérprete o coleccionista adecuado.
+        </p>
+        <p class="hero-note">Venta directa · Valencia, España</p>
+        <div class="hero-scroll">
+            <div class="scroll-line"></div>
+            <span>Ver instrumentos</span>
+        </div>
+    </section>
+
+    <!-- INSTRUMENTOS -->
+    <section id="instrumentos">
+        <div class="container">
+            <p class="section-label">Instrumentos en venta</p>
+
+            <!-- LAÚD BARROCO -->
+            <div class="instrument">
+                <div class="instrument-inner">
+                    <div class="instrument-image">
+                        <!-- Reemplazar src por la foto real del laúd -->
+                        <div class="img-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M12 2C8 2 5 6 5 10c0 3 1.5 5.5 4 7l-.5 3.5a1 1 0 001 1h5a1 1 0 001-1L15 17c2.5-1.5 4-4 4-7 0-4-3-8-7-8z"/>
+                                <line x1="12" y1="2" x2="12" y2="5"/>
+                            </svg>
+                            <span>Foto del instrumento</span>
+                        </div>
+                    </div>
+                    <div class="instrument-body">
+                        <span class="instrument-tag">Laúd · Período Barroco</span>
+                        <h2 class="instrument-title">Laúd Barroco<br>de 13 Órdenes</h2>
+                        <p class="instrument-subtitle">Adquirido a luthier, 2005</p>
+                        <p class="instrument-desc">
+                            Laúd barroco de 13 órdenes en excelente estado de conservación.
+                            El laúd de 13 órdenes representa la cúspide del desarrollo organológico
+                            del instrumento en el período barroco tardío, siendo el formato preferido
+                            por los grandes compositores de la escuela alemana y francesa del siglo XVII
+                            y principios del XVIII. Ideal para interpretación de repertorio de Bach,
+                            Weiss, Gallot o de Visée.
+                        </p>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <p class="spec-label">Tipo</p>
+                                <p class="spec-value">Laúd barroco</p>
+                            </div>
+                            <div class="spec-item">
+                                <p class="spec-label">Órdenes</p>
+                                <p class="spec-value">13</p>
+                            </div>
+                            <div class="spec-item">
+                                <p class="spec-label">Procedencia</p>
+                                <p class="spec-value">Luthier especializado</p>
+                            </div>
+                            <div class="spec-item">
+                                <p class="spec-label">Año de adquisición</p>
+                                <p class="spec-value">2005</p>
+                            </div>
+                        </div>
+                        <a href="#contacto" class="btn-contact">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                            </svg>
+                            Solicitar información
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GUITARRA SALVADOR IBÁÑEZ -->
+            <div class="instrument">
+                <div class="instrument-inner reverse">
+                    <div class="instrument-image">
+                        <!-- Reemplazar src por la foto real de la guitarra -->
+                        <div class="img-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M12 2c-1.5 0-2.5 1-2.5 2.5v1c-2 .5-3.5 2-3.5 4 0 2.5 2 4 4 5l-.5 6a1 1 0 001 1h3a1 1 0 001-1l-.5-6c2-1 4-2.5 4-5 0-2-1.5-3.5-3.5-4v-1C14.5 3 13.5 2 12 2z"/>
+                            </svg>
+                            <span>Foto del instrumento</span>
+                        </div>
+                    </div>
+                    <div class="instrument-body">
+                        <span class="instrument-tag">Guitarra · Pieza histórica</span>
+                        <h2 class="instrument-title">Guitarra<br>Salvador Ibáñez</h2>
+                        <p class="instrument-subtitle">Valencia · Principios del siglo XX · 9 cuerdas</p>
+                        <p class="instrument-desc">
+                            Guitarra de nueve cuerdas construida en el taller de <strong>Salvador Ibáñez</strong>,
+                            Valencia, a principios del siglo XX. Las guitarras de nueve cuerdas de este período
+                            —con tres bordones adicionales en clavijero extendido— fueron concebidas para
+                            ampliar el registro bajo del solista de concierto. Una pieza de valor
+                            organológico, histórico y sonoro que merece llegar a quien la comprenda.
+                        </p>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <p class="spec-label">Constructor</p>
+                                <p class="spec-value">Salvador Ibáñez</p>
+                            </div>
+                            <div class="spec-item">
+                                <p class="spec-label">Cuerdas</p>
+                                <p class="spec-value">9</p>
+                            </div>
+                            <div class="spec-item">
+                                <p class="spec-label">Origen</p>
+                                <p class="spec-value">Valencia, España</p>
+                            </div>
+                            <div class="spec-item">
+                                <p class="spec-label">Período</p>
+                                <p class="spec-value">Principios s. XX</p>
+                            </div>
+                        </div>
+                        <a href="#contacto" class="btn-contact">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                            </svg>
+                            Solicitar información
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- HISTORIA SALVADOR IBÁÑEZ -->
+    <section id="historia" class="historia">
+        <div class="container">
+            <p class="section-label">Contexto histórico</p>
+            <div class="historia-inner">
+                <div class="historia-aside">
+                    <p class="year">c. 1854 — 1920</p>
+                    <h2>Salvador<br><em>Ibáñez</em></h2>
+                    <p style="font-size:0.85rem; color: var(--faint); line-height:1.7; margin-top:1rem;">
+                        Maestro luthier<br>
+                        Valencia · España
+                    </p>
+                </div>
+                <div class="historia-content">
+                    <p>
+                        Salvador Ibáñez fue uno de los constructores de guitarras más importantes
+                        de la España de finales del siglo XIX y principios del XX, y su obra
+                        representa un capítulo singular en la historia de la luthería valenciana.
+                    </p>
+                    <p>
+                        Establecido en Valencia —ciudad con una larga tradición en la fabricación
+                        de instrumentos de cuerda—, Ibáñez fundó su taller en torno a 1882.
+                        Sus guitarras destacaron por la calidad de sus materiales, la precisión
+                        de su construcción y una sonoridad que respondía a las exigencias del
+                        concierto de la época. El taller llegó a exportar instrumentos a Europa
+                        y América, logrando un reconocimiento internacional poco habitual
+                        para un luthier español de entonces.
+                    </p>
+
+                    <div class="historia-pull">
+                        «Sus instrumentos compitieron en calidad con las mejores casas
+                        europeas del momento, en una época dorada para la guitarra de concierto.»
+                    </div>
+
+                    <p>
+                        La marca alcanzó tal proyección que su nombre pervive hoy, aunque
+                        de forma paradójica: a mediados del siglo XX, la empresa japonesa
+                        <strong>Hoshino Gakki</strong> adquirió los derechos del nombre comercial
+                        y lo convirtió en la marca eléctrica <strong>Ibanez</strong>,
+                        mundialmente conocida. Los instrumentos originales del taller valenciano
+                        no tienen ninguna relación con esa producción posterior; son piezas
+                        únicas de un período irrepetible.
+                    </p>
+                    <p>
+                        Una guitarra de <strong>nueve cuerdas</strong> de principios del siglo XX,
+                        procedente del taller de Salvador Ibáñez, es hoy una pieza de colección
+                        de primer orden: testimonio vivo de la luthería española en su momento
+                        de mayor expansión internacional, y un instrumento funcionalmente
+                        extraordinario para el intérprete especializado en repertorio
+                        de la Belle Époque.
+                    </p>
+
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <span class="t-year">c.1882</span>
+                            <div class="t-dot"></div>
+                            <p class="t-text">Fundación del taller en Valencia. Primeras guitarras de concierto.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <span class="t-year">1900</span>
+                            <div class="t-dot"></div>
+                            <p class="t-text">Proyección internacional. Exportación a Europa y América. Reconocimiento en exposiciones de la época.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <span class="t-year">s. XX</span>
+                            <div class="t-dot"></div>
+                            <p class="t-text">El taller produce guitarras de distintas configuraciones, incluidas las de 9 cuerdas para solistas de concierto.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <span class="t-year">1957</span>
+                            <div class="t-dot"></div>
+                            <p class="t-text">Hoshino Gakki (Japón) adquiere los derechos del nombre, dando origen a la marca eléctrica «Ibanez». Los instrumentos originales valencianos permanecen como piezas históricas independientes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" class="contacto">
+        <div class="container">
+            <p class="section-label" style="justify-content:center; text-align:center;">Contacto</p>
+            <h2>Hablemos<br>del instrumento<br><em>que le interesa</em></h2>
+            <p class="contacto-desc">
+                Venta directa. Se atiende a compradores, coleccionistas
+                e intérpretes con conocimiento del instrumento.
+                No se responde a ofertas sin argumentar.
+            </p>
+            <div class="contacto-cards">
+                <div class="contacto-card">
+                    <p class="contacto-card-label">Teléfono</p>
+                    <p class="contacto-card-value">
+                        <a href="tel:+34654920179">654 920 179</a>
+                    </p>
+                </div>
+                <div class="contacto-card">
+                    <p class="contacto-card-label">Correo electrónico</p>
+                    <p class="contacto-card-value">
+                        <a href="mailto:tono.bellido@gmail.com">tono.bellido@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+            <p class="contacto-note">
+                — Estos instrumentos merecen llegar a las manos adecuadas —
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <span>Tañer Antiguo</span>
+        <span>Valencia, España · 2025</span>
+    </footer>
+
+</body>
+</html>
